@@ -1,0 +1,19 @@
+{
+  "name": "vibecode-security-gate",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Find the mistakes vibe coding introduces - before attackers do.",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "cli": "pnpm --filter @vibecode/cli start"
+  },
+  "keywords": ["security", "scanner", "vibe-coding", "lovable", "bolt", "v0", "cursor", "supabase"],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
