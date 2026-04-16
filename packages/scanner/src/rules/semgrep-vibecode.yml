@@ -1,0 +1,109 @@
+rules:
+  # --- Secret Scanner Rules ---
+
+  - id: vibecode-openai-key-in-client
+    patterns:
+      - pattern: |
+          fetch("https://api.openai.com/...", ...)
+    message: >
+      Direct API call to OpenAI from client-side code. The API key will be
+      visible in browser DevTools. Move this call to a server-side API route.
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: ["CWE-798"]
+      vibecode-module: frontend-checker
+
+  - id: vibecode-anthropic-key-in-client
+    patterns:
+      - pattern: |
+          fetch("https://api.anthropic.com/...", ...)
+    message: >
+      Direct API call to Anthropic from client-side code. Move to server-side.
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      vibecode-module: frontend-checker
+
+  - id: vibecode-stripe-secret-in-client
+    patterns:
+      - pattern: |
+          fetch("https://api.stripe.com/...", ...)
+    message: >
+      Stripe API called from client-side code. Use Stripe.js on the client
+      and handle secret operations server-side.
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      vibecode-module: frontend-checker
+
+  - id: vibecode-supabase-service-role
+    pattern: |
+      createClient($URL, $KEY, ...)
+    metavariable-regex:
+      metavariable: $KEY
+      regex: ".*service_role.*"
+    message: >
+      Supabase client initialized with service_role key. This bypasses all
+      RLS policies. Use the anon key for client-side access.
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: ["CWE-798"]
+      vibecode-module: database-checker
+
+  - id: vibecode-public-env-secret
+    pattern-regex: "(VITE_|NEXT_PUBLIC_|REACT_APP_).*(SECRET|KEY|TOKEN|PASSWORD)"
+    message: >
+      Secret value in a public environment variable. Values prefixed with
+      VITE_, NEXT_PUBLIC_, or REACT_APP_ are embedded in the client bundle.
+    languages: [generic]
+    severity: ERROR
+    metadata:
+      category: security
+      vibecode-module: secret-scanner
+
+  - id: vibecode-eval-with-llm-output
+    patterns:
+      - pattern: |
+          eval($X)
+      - metavariable-regex:
+          metavariable: $X
+          regex: ".*(response|result|output|completion|message|content).*"
+    message: >
+      eval() called with what appears to be LLM output. This enables
+      arbitrary code execution via prompt injection.
+    languages: [typescript, javascript]
+    severity: ERROR
+    metadata:
+      category: security
+      cwe: ["CWE-94"]
+      vibecode-module: agent-checker
+
+  - id: vibecode-dangerouslysetinnerhtml-llm
+    pattern: |
+      dangerouslySetInnerHTML={{__html: $X}}
+    message: >
+      dangerouslySetInnerHTML used — if rendering AI/LLM output, this enables
+      XSS via prompt injection. Use a sanitizer like DOMPurify.
+    languages: [typescript, javascript]
+    severity: WARNING
+    metadata:
+      category: security
+      cwe: ["CWE-79"]
+      vibecode-module: agent-checker
+
+  - id: vibecode-firebase-open-rules
+    pattern-regex: "allow read, write: if true"
+    message: >
+      Firebase security rules allow unrestricted read/write access. Add
+      proper authentication and authorization checks.
+    languages: [generic]
+    severity: ERROR
+    metadata:
+      category: security
+      vibecode-module: database-checker

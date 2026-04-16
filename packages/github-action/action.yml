@@ -1,0 +1,49 @@
+name: "VibeCode Security Gate"
+description: "Scan vibe-coded projects for security vulnerabilities before deploy"
+author: "VibeCode Security"
+
+branding:
+  icon: "shield"
+  color: "blue"
+
+inputs:
+  path:
+    description: "Path to the project to scan"
+    required: false
+    default: "."
+  modules:
+    description: "Comma-separated list of modules to run"
+    required: false
+    default: "secret-scanner,frontend-checker,database-checker,agent-checker"
+  threshold:
+    description: "Minimum passing score (0-100)"
+    required: false
+    default: "70"
+  supabase-url:
+    description: "Supabase project URL for active database probing"
+    required: false
+  supabase-anon-key:
+    description: "Supabase anon key for active database probing"
+    required: false
+  fail-on-findings:
+    description: "Fail the action if any findings are detected"
+    required: false
+    default: "true"
+
+outputs:
+  score:
+    description: "Overall security score (0-100)"
+  grade:
+    description: "Security grade (A-F)"
+  findings-count:
+    description: "Total number of findings"
+  critical-count:
+    description: "Number of critical findings"
+  report-json:
+    description: "Full scan report as JSON"
+  status:
+    description: "Scan status (passed/warning/failed)"
+
+runs:
+  using: "node20"
+  main: "dist/index.js"
